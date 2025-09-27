@@ -12,6 +12,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import GradientBackground from '@/components/ui/GradientBackground';
+import { theme } from '@/constants/theme';
 import { DataService } from '../services/dataService';
 import { FamilyMember } from '../types/medication';
 
@@ -58,9 +60,10 @@ export default function AddFamilyMemberScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#4A90E2" />
-      <View style={[styles.gradient, styles.gradientBackground]}>
+    <GradientBackground>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="light-content" backgroundColor={theme.colors.primaryDark} />
+
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
@@ -84,7 +87,7 @@ export default function AddFamilyMemberScreen() {
                 value={name}
                 onChangeText={setName}
                 placeholder="Enter family member's name"
-                placeholderTextColor="#999"
+                placeholderTextColor={theme.colors.fieldDefaultPlaceholder}
                 autoCapitalize="words"
                 autoCorrect={false}
               />
@@ -104,7 +107,7 @@ export default function AddFamilyMemberScreen() {
                   <Ionicons
                     name="person"
                     size={20}
-                    color={selectedType === 'adult' ? 'white' : '#4A90E2'}
+                    color={selectedType === 'adult' ? theme.colors.fieldSelectedText : theme.colors.primary}
                   />
                   <Text style={[
                     styles.typeButtonText,
@@ -122,9 +125,9 @@ export default function AddFamilyMemberScreen() {
                   onPress={() => setSelectedType('child')}
                 >
                   <Ionicons
-                    name="lock-closed"
+                    name="happy"
                     size={20}
-                    color={selectedType === 'child' ? 'white' : '#F5A623'}
+                    color={selectedType === 'child' ? theme.colors.fieldSelectedText : theme.colors.warning}
                   />
                   <Text style={[
                     styles.typeButtonText,
@@ -138,7 +141,7 @@ export default function AddFamilyMemberScreen() {
 
             {/* Info Card */}
             <View style={styles.infoCard}>
-              <Ionicons name="information-circle" size={20} color="#4A90E2" />
+              <Ionicons name="information-circle" size={20} color={theme.colors.primary} />
               <Text style={styles.infoText}>
                 Adults can manage their own medications and take doses.
                 Children's medications require adult supervision.
@@ -158,140 +161,133 @@ export default function AddFamilyMemberScreen() {
               <Text style={styles.saveButtonText}>Adding...</Text>
             ) : (
               <>
-                <Ionicons name="checkmark" size={20} color="white" />
+                <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
                 <Text style={styles.saveButtonText}>Add Family Member</Text>
               </>
             )}
           </TouchableOpacity>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: '#4A90E2',
-  },
-  gradient: {
-    flex: 1,
-  },
-  gradientBackground: {
-    backgroundColor: '#4A90E2',
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    paddingTop: 50,
-    backgroundColor: 'transparent',
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+    paddingTop: theme.spacing.xl,
   },
   backButton: {
-    padding: 8,
+    padding: theme.spacing.sm,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontSize: theme.typography.xl,
+    fontWeight: theme.typography.semibold,
+    color: theme.colors.sectionTextPrimary,
   },
   placeholder: {
     width: 40,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: theme.spacing.lg,
   },
   form: {
-    paddingTop: 30,
+    paddingTop: theme.spacing.xl,
   },
   inputSection: {
-    marginBottom: 24,
+    marginBottom: theme.spacing.lg,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    fontSize: theme.typography.base,
+    fontWeight: theme.typography.semibold,
+    color: theme.colors.sectionTextPrimary,
+    marginBottom: theme.spacing.sm,
   },
   textInput: {
-    backgroundColor: 'white',
-    borderRadius: 12,
+    backgroundColor: theme.colors.fieldDefault,
+    borderRadius: theme.borderRadius.md,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    fontSize: 16,
-    color: '#333',
+    fontSize: theme.typography.base,
+    color: theme.colors.fieldDefaultText,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: theme.colors.fieldDefaultBorder,
   },
   typeContainer: {
     flexDirection: 'row',
-    gap: 12,
+    gap: theme.spacing.sm,
   },
   typeButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white',
-    borderRadius: 12,
-    paddingVertical: 16,
+    backgroundColor: theme.colors.fieldDefault,
+    borderRadius: theme.borderRadius.md,
+    paddingVertical: 14,
     paddingHorizontal: 12,
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
+    borderWidth: 1,
+    borderColor: theme.colors.fieldDefaultBorder,
   },
   typeButtonSelected: {
-    backgroundColor: '#FF6B35',
-    borderColor: '#FF6B35',
+    backgroundColor: theme.colors.fieldSelected,
+    borderColor: theme.colors.fieldSelectedBorder,
   },
   typeButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#666',
-    marginLeft: 8,
+    fontSize: theme.typography.sm,
+    fontWeight: theme.typography.medium,
+    color: theme.colors.fieldDefaultText,
+    marginLeft: theme.spacing.sm,
   },
   typeButtonTextSelected: {
-    color: 'white',
+    color: theme.colors.fieldSelectedText,
   },
   infoCard: {
     flexDirection: 'row',
-    backgroundColor: '#E3F2FD',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 8,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginTop: theme.spacing.sm,
+    ...theme.shadows.sm,
   },
   infoText: {
     flex: 1,
-    fontSize: 14,
-    color: '#4A90E2',
+    fontSize: theme.typography.sm,
+    color: theme.colors.textSecondary,
     lineHeight: 20,
-    marginLeft: 12,
+    marginLeft: theme.spacing.md,
   },
   bottomContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    paddingBottom: 40,
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.lg,
+    paddingBottom: theme.spacing.xl,
+    backgroundColor: 'transparent',
   },
   saveButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B35',
-    borderRadius: 12,
-    paddingVertical: 16,
+    backgroundColor: theme.colors.sectionTextPrimary,
+    borderRadius: theme.borderRadius.lg,
+    paddingVertical: theme.spacing.md,
+    ...theme.shadows.md,
   },
   saveButtonDisabled: {
-    backgroundColor: '#D0D0D0',
+    backgroundColor: theme.colors.border,
   },
   saveButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
+    color: theme.colors.primary,
+    fontSize: theme.typography.base,
+    fontWeight: theme.typography.semibold,
+    marginLeft: theme.spacing.sm,
   },
 });

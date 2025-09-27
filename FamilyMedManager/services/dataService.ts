@@ -204,15 +204,6 @@ export class DataService {
       const members = await this.getFamilyMembers();
       const updatedMembers = members.filter(member => member.id !== memberId);
       await this.saveFamilyMembers(updatedMembers);
-
-      // Also update medications
-      const medications = await this.getMedications();
-      const updatedMedications = medications.map(med => ({
-        ...med,
-        assignedMembers: med.assignedMembers.filter(id => id !== memberId),
-      }));
-      await this.saveMedications(updatedMedications);
-
     } catch (error) {
       console.error('Error deleting family member:', error);
       throw error;

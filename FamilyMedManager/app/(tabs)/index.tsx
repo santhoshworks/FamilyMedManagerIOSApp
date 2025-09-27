@@ -132,7 +132,7 @@ export default function HomeScreen() {
             </View>
           ) : (
             <>
-              <Text style={styles.title}>Today's Medications</Text>
+              <Text style={styles.title}>Available Medications</Text>
               {medications.map(renderMedicationCard)}
             </>
           )}
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#FFFFFF',
     textAlign: 'center',

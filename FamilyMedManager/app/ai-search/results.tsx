@@ -127,16 +127,33 @@ export default function ResultsScreen() {
           </View>
           <View style={[
             styles.availabilityBadge,
-            { backgroundColor: recommendation.available ? '#10B981' : '#EF4444' }
+            {
+              backgroundColor: recommendation.isOTC
+                ? '#3B82F6' // Blue for OTC
+                : recommendation.available
+                  ? '#10B981' // Green for available
+                  : '#EF4444' // Red for out of stock
+            }
           ]}>
             <Text style={styles.availabilityText}>
-              {recommendation.available ? 'Available' : 'Out of Stock'}
+              {recommendation.isOTC
+                ? 'OTC'
+                : recommendation.available
+                  ? 'Available'
+                  : 'Out of Stock'
+              }
             </Text>
           </View>
         </View>
         <Text style={styles.recommendationReason}>{recommendation.reason}</Text>
-        {recommendation.available && recommendation.currentStock && (
+        {recommendation.isOTC && recommendation.otcNote && (
+          <Text style={styles.otcNote}>{recommendation.otcNote}</Text>
+        )}
+        {!recommendation.isOTC && recommendation.available && recommendation.currentStock && (
           <Text style={styles.stockInfo}>Stock: {recommendation.currentStock} units</Text>
+        )}
+        {recommendation.isOTC && (
+          <Text style={styles.otcInfo}>💡 Available at pharmacies and stores</Text>
         )}
       </View>
     );
@@ -231,7 +248,7 @@ export default function ResultsScreen() {
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <Text style={styles.title}>Your Recommendations</Text>
           <Text style={styles.subtitle}>
-            Based on your symptoms and available medications
+            Based on your symptoms, available medications, and OTC options
           </Text>
 
           {aiResponse && (
@@ -506,8 +523,8 @@ const styles = StyleSheet.create({
   },
   recommendationHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: theme.spacing.sm,
+    alignItems: 'flex-start',
+    marginBottom: theme.spacing.md,
   },
   priorityIndicator: {
     width: 4,
@@ -517,16 +534,21 @@ const styles = StyleSheet.create({
   },
   recommendationInfo: {
     flex: 1,
+    paddingRight: theme.spacing.sm,
   },
   medicationName: {
     fontSize: theme.typography.base,
     fontWeight: theme.typography.semibold,
     color: '#FFFFFF',
+    marginBottom: 4,
+    flexWrap: 'wrap',
+    lineHeight: 20,
   },
   medicationDosage: {
     fontSize: theme.typography.sm,
     color: 'rgba(255, 255, 255, 0.8)',
-    marginTop: 2,
+    flexWrap: 'wrap',
+    lineHeight: 18,
   },
   availabilityBadge: {
     paddingHorizontal: theme.spacing.sm,
@@ -547,6 +569,18 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.xs,
     color: 'rgba(255, 255, 255, 0.7)',
     marginTop: theme.spacing.sm,
+  },
+
+  otcNote: {
+    fontSize: theme.typography.sm,
+    color: '#3B82F6',
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
+  otcInfo: {
+    fontSize: theme.typography.sm,
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginTop: 4,
   },
   firstAidStep: {
     flexDirection: 'row',
@@ -692,7 +726,7 @@ const styles = StyleSheet.create({
   disclaimerTitle: {
     fontSize: theme.typography.base,
     fontWeight: theme.typography.semibold,
-    color: '#4A90E2',
+    color: '#FFFFFF',
     marginBottom: theme.spacing.xs,
   },
 });

@@ -34,6 +34,8 @@ export interface MedicationRecommendation {
   priority: 'high' | 'medium' | 'low';
   available: boolean;
   currentStock?: number;
+  isOTC?: boolean;
+  otcNote?: string;
 }
 
 export interface FirstAidInstruction {
