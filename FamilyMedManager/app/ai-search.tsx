@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   subtitle: {
-    fontSize: theme.typography.md,
+    fontSize: theme.typography.base,
     color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'center',
     lineHeight: 22,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     ...theme.shadows.md,
   },
   getStartedButtonText: {
-    fontSize: theme.typography.md,
+    fontSize: theme.typography.base,
     fontWeight: theme.typography.semibold,
     color: theme.colors.primary,
     marginRight: theme.spacing.sm,

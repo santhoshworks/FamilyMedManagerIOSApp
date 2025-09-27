@@ -1,5 +1,7 @@
 import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -17,6 +19,7 @@ import { DataService } from '../services/newDataService';
 import { FamilyMember, MedicationWithMembers } from '../types/medication';
 
 export default function DashboardScreen() {
+  const router = useRouter();
   const [medications, setMedications] = useState<MedicationWithMembers[]>([]);
   const [, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +29,13 @@ export default function DashboardScreen() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Reload data whenever this screen gains focus (for example when coming back from Edit Medication)
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [])
+  );
 
   const loadData = async () => {
     try {
@@ -114,7 +124,7 @@ export default function DashboardScreen() {
         styles.medicationCard,
         medication.stockLevel === 'critical' && styles.medicationCardCritical
       ]}
-      onPress={() => handleTakeDose(medication.id)}
+      onPress={() => router.push({ pathname: '/medication-details', params: { medicationData: JSON.stringify(medication) } } as any)}
     >
       <View style={styles.medicationCardHeader}>
         <View style={styles.medicationIconContainer}>

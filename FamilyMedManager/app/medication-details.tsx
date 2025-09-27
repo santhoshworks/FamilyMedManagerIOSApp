@@ -32,7 +32,7 @@ export default function MedicationDetailsScreen() {
     }
   };
 
-  const DetailCard = ({ icon, title, value }: { icon: any; title: string; value: string }) => (
+  const DetailCard = ({ icon, title, value }: { icon: any; title: string; value?: string }) => (
     <View style={styles.detailCard}>
       <Ionicons name={icon} size={24} color="#FFFFFF" />
       <View style={styles.detailTextContainer}>
@@ -49,7 +49,6 @@ export default function MedicationDetailsScreen() {
           <TouchableOpacity style={styles.headerButton} onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle} numberOfLines={1}>{medication.name}</Text>
           <TouchableOpacity style={styles.headerButton} onPress={() => router.push(`/edit-medication/${medication.id}`)}>
             <Ionicons name="pencil" size={24} color="#FFFFFF" />
           </TouchableOpacity>
@@ -65,7 +64,7 @@ export default function MedicationDetailsScreen() {
             <Text style={styles.stockStatusTitle}>Inventory Status</Text>
             <View style={styles.stockStatusContent}>
               <Text style={[styles.stockStatusDays, { color: getStockColor(medication.stockLevel) }]}>
-                {medication.daysLeft} days left
+                {medication.daysLeft} Doses left
               </Text>
               <Text style={styles.stockStatusCount}>
                 ({medication.currentCount}/{medication.totalCount} pills)

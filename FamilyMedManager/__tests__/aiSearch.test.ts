@@ -4,7 +4,7 @@ import { AISearchInput } from '../types/aiSearch';
 import { Medication } from '../types/medication';
 
 // Mock data for testing
-const mockMedications: Medication[] = [
+const mockMedications = [
   {
     id: '1',
     name: 'Ibuprofen',
@@ -25,7 +25,7 @@ const mockMedications: Medication[] = [
     familyMemberId: 'adult-1',
     notes: 'For pain and fever',
   },
-];
+] as unknown as Medication[];
 
 const mockSearchInput: AISearchInput = {
   symptoms: ['headache', 'fever'],
@@ -39,7 +39,7 @@ describe('AI Search Feature', () => {
     test('should return fallback response when API key is not configured', async () => {
       // This test will use the fallback response since we don't have a real API key
       const response = await AIService.getRecommendations(mockSearchInput, mockMedications);
-      
+
       expect(response).toBeDefined();
       expect(response.recommendations).toBeDefined();
       expect(response.firstAidInstructions).toBeDefined();
@@ -51,18 +51,18 @@ describe('AI Search Feature', () => {
 
     test('should include available medications in recommendations', async () => {
       const response = await AIService.getRecommendations(mockSearchInput, mockMedications);
-      
+
       // Check if any of our mock medications are mentioned in recommendations
       const recommendationText = JSON.stringify(response.recommendations).toLowerCase();
       const hasIbuprofen = recommendationText.includes('ibuprofen');
       const hasAcetaminophen = recommendationText.includes('acetaminophen');
-      
+
       expect(hasIbuprofen || hasAcetaminophen).toBe(true);
     });
 
     test('should provide first aid instructions for symptoms', async () => {
       const response = await AIService.getRecommendations(mockSearchInput, mockMedications);
-      
+
       expect(response.firstAidInstructions.length).toBeGreaterThan(0);
       expect(response.firstAidInstructions[0]).toHaveProperty('step');
       expect(response.firstAidInstructions[0]).toHaveProperty('instruction');

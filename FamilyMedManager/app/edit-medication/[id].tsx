@@ -102,10 +102,22 @@ export default function EditMedication() {
 
       await DataService.updateMedication(updatedMedication);
 
-      router.back();
       Alert.alert(
         'Success!',
-        'Medication has been updated successfully.'
+        'Medication has been updated successfully.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Navigate back to dashboard to ensure data refresh
+              try {
+                router.replace('/dashboard');
+              } catch {
+                router.back();
+              }
+            }
+          }
+        ]
       );
     } catch (error) {
       console.error('Error updating medication:', error);

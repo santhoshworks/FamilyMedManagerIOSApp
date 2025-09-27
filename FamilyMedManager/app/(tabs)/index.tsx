@@ -2,6 +2,7 @@ import DrawerMenu from '@/components/DrawerMenu';
 import GradientBackground from '@/components/ui/GradientBackground';
 import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { SplashScreen, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -32,6 +33,13 @@ export default function HomeScreen() {
       SplashScreen.hideAsync();
     }
   }, [loading]);
+
+  // Reload data whenever this screen gains focus (for example when coming back from other screens)
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [])
+  );
 
   const loadData = async () => {
     try {

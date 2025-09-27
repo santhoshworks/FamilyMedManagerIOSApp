@@ -1,6 +1,7 @@
 import GradientBackground from '@/components/ui/GradientBackground';
 import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -23,6 +24,13 @@ export default function ManageMedications() {
   useEffect(() => {
     loadMedications();
   }, []);
+
+  // Reload medications whenever this screen gains focus (for example when coming back from Edit)
+  useFocusEffect(
+    React.useCallback(() => {
+      loadMedications();
+    }, [])
+  );
 
   const loadMedications = async () => {
     try {

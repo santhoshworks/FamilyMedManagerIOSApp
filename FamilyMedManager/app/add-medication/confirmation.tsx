@@ -151,7 +151,7 @@ export default function ConfirmationScreen() {
                 <Text style={styles.detailValue}>{params.totalCount}</Text>
               </View>
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Days Left:</Text>
+                <Text style={styles.detailLabel}>Doses Left:</Text>
                 <Text style={styles.detailValue}>{params.daysLeft} days</Text>
               </View>
               <View style={styles.detailRow}>

@@ -48,7 +48,14 @@ export default function AddFamilyMemberScreen() {
         [
           {
             text: 'OK',
-            onPress: () => router.back()
+            onPress: () => {
+              // Use replace to ensure the Manage screen reloads its data.
+              try {
+                router.replace('/manage-family-members');
+              } catch {
+                router.back();
+              }
+            }
           }
         ]
       );
