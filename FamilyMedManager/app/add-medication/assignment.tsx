@@ -1,4 +1,5 @@
 import GradientBackground from '@/components/ui/GradientBackground';
+import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -11,8 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { theme } from '@/constants/theme';
-import { DataService } from '../../services/dataService';
+import { DataService } from '../../services/newDataService';
 import { FamilyMember } from '../../types/medication';
 
 export default function AssignmentScreen() {
@@ -133,7 +133,9 @@ export default function AssignmentScreen() {
             <Text style={styles.headerTitle}>Add Medication</Text>
             <Text style={styles.stepText}>Step 2 of 4</Text>
           </View>
-          <View style={styles.placeholder} />
+          <TouchableOpacity style={styles.placeholder} onPress={() => router.push('/(tabs)')}>
+            <Ionicons name="home" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
 
         {/* Progress Bar */}

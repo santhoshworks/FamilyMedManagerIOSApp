@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { DataService } from '../../services/dataService';
+import { DataService } from '../../services/newDataService';
 import { FamilyMember, Medication } from '../../types/medication';
 
 const medicationForms = [

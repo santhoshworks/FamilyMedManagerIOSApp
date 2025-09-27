@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { DataService } from '../../services/dataService';
+import { DataService } from '../../services/newDataService';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
@@ -86,7 +86,9 @@ export default function ConfirmationScreen() {
             <Text style={styles.headerTitle}>Add Medication</Text>
             <Text style={styles.stepText}>Step 4 of 4</Text>
           </View>
-          <View style={styles.placeholder} />
+          <TouchableOpacity style={styles.placeholder} onPress={() => router.push('/(tabs)')}>
+            <Ionicons name="home" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
 
         {/* Progress Bar */}

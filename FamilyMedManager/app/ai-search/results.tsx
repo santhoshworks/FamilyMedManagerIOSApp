@@ -1,7 +1,7 @@
 import { theme } from '@/constants/theme';
 import { AIService } from '@/services/aiService';
-import { DataService } from '@/services/dataService';
 import { LoggingService } from '@/services/loggingService';
+import { DataService } from '@/services/newDataService';
 import { AISearchInput, AISearchResponse } from '@/types/aiSearch';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -190,7 +190,9 @@ export default function ResultsScreen() {
               <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>AI Recommendations</Text>
-            <View style={styles.placeholder} />
+            <TouchableOpacity style={styles.placeholder} onPress={() => router.push('/(tabs)')}>
+              <Ionicons name="home" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
           </View>
 
           <View style={styles.loadingContainer}>
@@ -214,7 +216,9 @@ export default function ResultsScreen() {
               <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>AI Recommendations</Text>
-            <View style={styles.placeholder} />
+            <TouchableOpacity style={styles.placeholder} onPress={() => router.push('/(tabs)')}>
+              <Ionicons name="home" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
           </View>
 
           <View style={styles.errorContainer}>
@@ -241,7 +245,9 @@ export default function ResultsScreen() {
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>AI Recommendations</Text>
-          <View style={styles.placeholder} />
+          <TouchableOpacity style={styles.placeholder} onPress={() => router.push('/(tabs)')}>
+            <Ionicons name="home" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
 
         {/* Content */}

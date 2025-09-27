@@ -29,7 +29,9 @@ export default function AddMedicationScreen() {
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Add Medication</Text>
-          <View style={styles.placeholder} />
+          <TouchableOpacity style={styles.placeholder} onPress={() => router.push('/(tabs)')}>
+            <Ionicons name="home" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
 
         {/* Content */}

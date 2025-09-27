@@ -13,13 +13,14 @@ import {
   type TextStyle,
   type ViewStyle,
 } from 'react-native';
-import { DataService } from '../services/dataService';
+import { DataService } from '../services/newDataService';
 import { FamilyMember, MedicationWithMembers } from '../types/medication';
 
 export default function DashboardScreen() {
   const [medications, setMedications] = useState<MedicationWithMembers[]>([]);
   const [, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [takingDoseId, setTakingDoseId] = useState<string | null>(null);
   const [selectedView, setSelectedView] = useState<'adults' | 'kids'>('adults');
 
   useEffect(() => {
@@ -50,6 +51,9 @@ export default function DashboardScreen() {
   };
 
   const handleTakeDose = async (medicationId: string) => {
+    // Prevent duplicate requests for the same medication
+    if (takingDoseId === medicationId) return;
+    setTakingDoseId(medicationId);
     // Optimistically update UI, then persist. Revert on error.
     const previousMedications = medications;
     const computeStockLevelLocal = (daysLeft: number) => {
@@ -73,19 +77,22 @@ export default function DashboardScreen() {
         } as MedicationWithMembers;
       });
 
-  setMedications(updated);
+      setMedications(updated);
 
-  await DataService.takeDose(medicationId);
+      await DataService.takeDose(medicationId);
 
-  // Reload persisted data so all screens read the same source of truth
-  await loadData();
+      // Reload persisted data so all screens read the same source of truth
+      await loadData();
 
-  Alert.alert('Success', 'Dose recorded successfully!');
+      Alert.alert('Success', 'Dose recorded successfully!');
     } catch (error) {
       // revert
       setMedications(previousMedications);
       console.error('Failed to take dose:', error);
       Alert.alert('Error', 'Failed to record dose');
+    }
+    finally {
+      setTakingDoseId(null);
     }
   };
 
@@ -171,9 +178,11 @@ export default function DashboardScreen() {
         <TouchableOpacity
           style={[
             styles.takeButton,
-            medication.stockLevel === 'critical' && styles.takeButtonCritical
+            medication.stockLevel === 'critical' && styles.takeButtonCritical,
+            medication.currentCount === 0 && { opacity: 0.4 }
           ]}
           onPress={() => handleTakeDose(medication.id)}
+          disabled={medication.currentCount === 0 || takingDoseId === medication.id}
         >
           <Ionicons
             name="checkmark"

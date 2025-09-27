@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { DataService } from '../../services/dataService';
+import { DataService } from '../../services/newDataService';
 import { FamilyMember, MedicationWithMembers } from '../../types/medication';
 
 export default function HomeScreen() {

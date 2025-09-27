@@ -3,32 +3,27 @@ import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import {
-  Alert,
-  Modal,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { DataService } from '../services/dataService';
+import { useFocusEffect } from '@react-navigation/native';
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { DataService } from '../services/newDataService';
 import { FamilyMember } from '../types/medication';
 
 export default function ManageFamilyMembersScreen() {
   const router = useRouter();
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editType, setEditType] = useState<'adult' | 'child'>('adult');
+  // edit handled in separate screen; leftover modal state removed
 
   useEffect(() => {
     loadFamilyMembers();
   }, []);
+
+  // Reload members whenever this screen gains focus (for example when coming back from Add)
+  useFocusEffect(
+    React.useCallback(() => {
+      loadFamilyMembers();
+    }, [])
+  );
 
   const loadFamilyMembers = async () => {
     try {
@@ -42,35 +37,12 @@ export default function ManageFamilyMembersScreen() {
   };
 
   const handleEdit = (member: FamilyMember) => {
-    setEditingMember(member);
-    setEditName(member.name);
-    setEditType(member.type);
-    setEditModalVisible(true);
+    // Navigate to dedicated edit screen to keep UX consistent with "Add" flow
+    // use object form to satisfy expo-router's typed push
+    router.push({ pathname: '/edit-family-member', params: { id: member.id } } as any);
   };
 
-  const handleSaveEdit = async () => {
-    if (!editName.trim() || !editingMember) {
-      Alert.alert('Error', 'Please enter a valid name');
-      return;
-    }
-
-    try {
-      const updatedMember: FamilyMember = {
-        ...editingMember,
-        name: editName.trim(),
-        type: editType,
-        color: editType === 'adult' ? '#4A90E2' : '#F5A623',
-      };
-
-      await DataService.updateFamilyMember(updatedMember);
-      await loadFamilyMembers();
-      setEditModalVisible(false);
-      setEditingMember(null);
-      Alert.alert('Success', 'Family member updated successfully!');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to update family member');
-    }
-  };
+  // edit handled in separate screen
 
   const handleDelete = (member: FamilyMember) => {
     Alert.alert(
@@ -158,45 +130,7 @@ export default function ManageFamilyMembersScreen() {
           </TouchableOpacity>
         </View>
 
-        <Modal
-          visible={editModalVisible}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setEditModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Edit Family Member</Text>
-              <TextInput
-                style={styles.textInput}
-                value={editName}
-                onChangeText={setEditName}
-                placeholder="Enter name"
-                placeholderTextColor="rgba(255, 255, 255, 0.7)"
-              />
-              <View style={styles.typeSelector}>
-                <TouchableOpacity
-                  style={[styles.typeButton, editType === 'adult' && styles.typeButtonSelected]}
-                  onPress={() => setEditType('adult')}
-                >
-                  <Text style={styles.typeButtonText}>Adult</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.typeButton, editType === 'child' && styles.typeButtonSelected]}
-                  onPress={() => setEditType('child')}
-                >
-                  <Text style={styles.typeButtonText}>Child</Text>
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
-                <Text style={styles.saveButtonText}>Save Changes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setEditModalVisible(false)}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
+        {/* Modal removed; edit flow now handled on a dedicated screen */}
       </SafeAreaView>
     </GradientBackground>
   );

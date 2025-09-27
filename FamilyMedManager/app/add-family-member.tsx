@@ -1,3 +1,5 @@
+import GradientBackground from '@/components/ui/GradientBackground';
+import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -12,9 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import GradientBackground from '@/components/ui/GradientBackground';
-import { theme } from '@/constants/theme';
-import { DataService } from '../services/dataService';
+import { DataService } from '../services/newDataService';
 import { FamilyMember } from '../types/medication';
 
 export default function AddFamilyMemberScreen() {

@@ -94,7 +94,9 @@ export default function BasicInfoScreen() {
             <Text style={styles.headerTitle}>Add Medication</Text>
             <Text style={styles.stepText}>Step 1 of 4</Text>
           </View>
-          <View style={styles.placeholder} />
+          <TouchableOpacity style={styles.placeholder} onPress={() => router.push('/(tabs)')}>
+            <Ionicons name="home" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
 
         {/* Progress Bar */}
