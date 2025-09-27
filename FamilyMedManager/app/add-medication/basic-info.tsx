@@ -1,3 +1,4 @@
+import GradientBackground from '@/components/ui/GradientBackground';
 import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -12,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-// import { LinearGradient } from 'expo-linear-gradient';
 
 export default function BasicInfoScreen() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function BasicInfoScreen() {
     { id: 'capsule', label: 'Capsule', icon: 'ellipse-outline' },
     { id: 'liquid', label: 'Liquid', icon: 'water-outline' },
     { id: 'injection', label: 'Injection', icon: 'medical-outline' },
-    { id: 'cream', label: 'Cream/Ointment', icon: 'hand-left-outline' },
+    { id: 'cream', label: 'Cream', icon: 'hand-left-outline' },
     { id: 'inhaler', label: 'Inhaler', icon: 'fitness-outline' },
   ];
 
@@ -68,7 +68,7 @@ export default function BasicInfoScreen() {
       <Ionicons
         name={form.icon as any}
         size={24}
-        color={medicationForm === form.id ? theme.colors.success : theme.colors.textSecondary}
+        color={medicationForm === form.id ? theme.colors.fieldSelectedText : theme.colors.fieldDefaultText}
       />
       <Text style={[
         styles.formOptionText,
@@ -80,8 +80,8 @@ export default function BasicInfoScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={[styles.gradient, styles.gradientBackground]}>
+    <GradientBackground>
+      <SafeAreaView style={styles.container}>
         {/* Header with Progress */}
         <View style={styles.header}>
           <TouchableOpacity
@@ -126,7 +126,7 @@ export default function BasicInfoScreen() {
                 value={medicationName}
                 onChangeText={setMedicationName}
                 placeholder="e.g., Aspirin, Ibuprofen"
-                placeholderTextColor="rgb(255, 255, 255)"
+                placeholderTextColor={theme.colors.fieldDefaultPlaceholder}
                 autoCapitalize="words"
                 autoCorrect={false}
               />
@@ -140,7 +140,7 @@ export default function BasicInfoScreen() {
                 value={dosage}
                 onChangeText={setDosage}
                 placeholder="e.g., 500mg, 10ml, 1 tablet"
-                placeholderTextColor="rgb(255, 255, 255)"
+                placeholderTextColor={theme.colors.fieldDefaultPlaceholder}
                 autoCapitalize="none"
                 autoCorrect={false}
               />
@@ -163,23 +163,18 @@ export default function BasicInfoScreen() {
             onPress={handleNext}
           >
             <Text style={styles.nextButtonText}>Next: Assign to Family</Text>
-            <Ionicons name="arrow-forward" size={20} color="#4A90E2" />
+            <Ionicons name="arrow-forward" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  gradient: {
-    flex: 1,
-  },
-  gradientBackground: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
@@ -223,22 +218,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: theme.borderRadius.sm,
   },
-  progressText: {
-    color: '#FFFFFF',
-    fontSize: theme.typography.sm,
-    textAlign: 'center',
-    opacity: 0.9,
-  },
   content: {
     flex: 1,
     paddingHorizontal: theme.spacing.lg,
-  },
-  iconContainer: {
-    alignSelf: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: theme.borderRadius.xl,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
   },
   title: {
     fontSize: theme.typography.xxl,
@@ -246,14 +228,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: theme.spacing.xl,
-  },
-  subtitle: {
-    fontSize: theme.typography.base,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    opacity: 0.9,
-    marginBottom: theme.spacing.xl,
-    lineHeight: 24,
   },
   form: {
     flex: 1,
@@ -268,14 +242,14 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
   },
   textInput: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: theme.colors.fieldDefault,
     borderRadius: theme.borderRadius.md,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     fontSize: theme.typography.base,
-    color: '#FFFFFF',
+    color: theme.colors.fieldDefaultText,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: theme.colors.fieldDefaultBorder,
   },
   formGrid: {
     flexDirection: 'row',
@@ -285,27 +259,28 @@ const styles = StyleSheet.create({
   formOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: theme.colors.fieldDefault,
     borderRadius: theme.borderRadius.md,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     margin: theme.spacing.xs,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: theme.colors.fieldDefaultBorder,
     minWidth: '45%',
   },
   selectedFormOption: {
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderColor: '#FFFFFF',
+    backgroundColor: theme.colors.fieldSelected,
+    borderColor: theme.colors.fieldSelectedBorder,
   },
   formOptionText: {
     fontSize: theme.typography.sm,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: theme.colors.fieldDefaultText,
     marginLeft: theme.spacing.sm,
     fontWeight: theme.typography.medium,
   },
   selectedFormOptionText: {
-    color: '#FFFFFF',
+    color: theme.colors.fieldSelectedText,
+    fontWeight: theme.typography.semibold,
   },
   bottomContainer: {
     paddingHorizontal: theme.spacing.lg,

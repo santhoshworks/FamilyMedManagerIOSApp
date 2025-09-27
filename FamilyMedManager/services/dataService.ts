@@ -204,6 +204,15 @@ export class DataService {
       const members = await this.getFamilyMembers();
       const updatedMembers = members.filter(member => member.id !== memberId);
       await this.saveFamilyMembers(updatedMembers);
+
+      // Also update medications
+      const medications = await this.getMedications();
+      const updatedMedications = medications.map(med => ({
+        ...med,
+        assignedMembers: med.assignedMembers.filter(id => id !== memberId),
+      }));
+      await this.saveMedications(updatedMedications);
+
     } catch (error) {
       console.error('Error deleting family member:', error);
       throw error;
@@ -285,11 +294,26 @@ export class DataService {
       const medications = await this.getMedications();
       const updatedMedications = medications.map(med => {
         if (med.id === medicationId) {
-          const newCount = med.currentCount ? med.currentCount - 1 : undefined;
+          // Decrement daysLeft and currentCount (if present). Ensure we don't go negative.
+          const newCurrentCount = typeof med.currentCount === 'number' ? Math.max(0, med.currentCount - 1) : undefined;
+          const newDaysLeft = typeof med.daysLeft === 'number' ? Math.max(0, med.daysLeft - 1) : med.daysLeft;
+
+          // Recompute stock level based on daysLeft thresholds (critical: <=3, low: <=10, good: >10)
+          let newStockLevel = med.stockLevel || 'good';
+          if (typeof newDaysLeft === 'number') {
+            if (newDaysLeft <= 3) newStockLevel = 'critical';
+            else if (newDaysLeft <= 10) newStockLevel = 'low';
+            else newStockLevel = 'good';
+          }
+
+          console.log(`takeDose: updating med ${med.id} - currentCount: ${med.currentCount} -> ${newCurrentCount}, daysLeft: ${med.daysLeft} -> ${newDaysLeft}, stockLevel: ${med.stockLevel} -> ${newStockLevel}`);
+
           return {
             ...med,
             lastTaken: new Date(),
-            currentCount: newCount,
+            currentCount: newCurrentCount,
+            daysLeft: newDaysLeft,
+            stockLevel: newStockLevel,
           };
         }
         return med;

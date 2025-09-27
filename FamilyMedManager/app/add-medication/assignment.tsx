@@ -1,3 +1,4 @@
+import GradientBackground from '@/components/ui/GradientBackground';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -107,19 +108,19 @@ export default function AssignmentScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.gradient, styles.gradientBackground]}>
+      <GradientBackground>
+        <SafeAreaView style={styles.container}>
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Loading family members...</Text>
           </View>
-        </View>
-      </SafeAreaView>
+        </SafeAreaView>
+      </GradientBackground>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={[styles.gradient, styles.gradientBackground]}>
+    <GradientBackground>
+      <SafeAreaView style={styles.container}>
         {/* Header with Progress */}
         <View style={styles.header}>
           <TouchableOpacity
@@ -195,24 +196,19 @@ export default function AssignmentScreen() {
             <Ionicons
               name="arrow-forward"
               size={20}
-              color={selectedMembers.length === 0 ? '#999' : '#4A90E2'}
+              color={selectedMembers.length === 0 ? '#999' : theme.colors.primary}
             />
           </TouchableOpacity>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  gradient: {
-    flex: 1,
-  },
-  gradientBackground: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
@@ -255,11 +251,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#FFFFFF',
     borderRadius: 2,
-  },
-  progressText: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
   },
   content: {
     flex: 1,
@@ -405,7 +396,7 @@ const styles = StyleSheet.create({
   nextButtonText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#4A90E2',
+    color: theme.colors.primary,
   },
   disabledButtonText: {
     color: '#999',

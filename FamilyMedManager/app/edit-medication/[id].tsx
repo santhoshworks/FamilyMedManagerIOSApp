@@ -1,5 +1,6 @@
+import GradientBackground from '@/components/ui/GradientBackground';
+import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -20,7 +21,7 @@ const medicationForms = [
   { id: 'capsule', label: 'Capsule', icon: 'ellipse' },
   { id: 'liquid', label: 'Liquid', icon: 'water' },
   { id: 'injection', label: 'Injection', icon: 'medical' },
-  { id: 'cream', label: 'Cream/Ointment', icon: 'hand-left' },
+  { id: 'cream', label: 'Cream', icon: 'hand-left' },
   { id: 'inhaler', label: 'Inhaler', icon: 'fitness' },
 ];
 
@@ -29,6 +30,7 @@ const stockLevels = ['good', 'low', 'critical'];
 export default function EditMedication() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const [originalMedication, setOriginalMedication] = useState<Medication | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -58,6 +60,8 @@ export default function EditMedication() {
         return;
       }
 
+      setOriginalMedication(medication);
+
       // Populate form with existing data
       setMedicationName(medication.name || '');
       setDosage(medication.dosage || '');
@@ -75,6 +79,11 @@ export default function EditMedication() {
   };
 
   const handleSave = async () => {
+    if (!originalMedication) {
+      Alert.alert('Error', 'Original medication data not found.');
+      return;
+    }
+
     if (!medicationName.trim() || !dosage.trim() || !medicationForm) {
       Alert.alert('Error', 'Please fill in all required fields');
       return;
@@ -83,22 +92,17 @@ export default function EditMedication() {
     setSaving(true);
     try {
       const updatedMedication: Medication = {
-        id: id as string,
+        ...originalMedication,
         name: medicationName.trim(),
         dosage: dosage.trim(),
         form: medicationForm,
         assignedMembers: assignedTo,
         stockLevel,
-        daysLeft: 0, // This should be calculated based on actual logic
-        createdAt: new Date().toISOString(), // Keep original creation date in real app
       };
 
       await DataService.updateMedication(updatedMedication);
 
-      // Navigate back immediately after successful save
       router.back();
-
-      // Show success message without blocking navigation
       Alert.alert(
         'Success!',
         'Medication has been updated successfully.'
@@ -132,7 +136,7 @@ export default function EditMedication() {
       <Ionicons
         name={form.icon as any}
         size={24}
-        color={medicationForm === form.id ? '#FFFFFF' : '#4A90E2'}
+        color={medicationForm === form.id ? theme.colors.fieldSelectedText : theme.colors.fieldDefaultText}
       />
       <Text style={[
         styles.formOptionText,
@@ -163,30 +167,27 @@ export default function EditMedication() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <GradientBackground>
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Loading medication...</Text>
         </View>
-      </SafeAreaView>
+      </GradientBackground>
     );
   }
 
   return (
-    <LinearGradient
-      colors={['#667eea', '#764ba2']}
-      style={styles.container}
-    >
-      <SafeAreaView style={styles.safeArea}>
+    <GradientBackground>
+      <SafeAreaView style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
-            style={styles.backButton}
+            style={styles.headerButton}
             onPress={() => router.back()}
           >
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Medication</Text>
-          <View style={styles.placeholder} />
+          <View style={{ width: 40 }} />
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -199,7 +200,7 @@ export default function EditMedication() {
                 value={medicationName}
                 onChangeText={setMedicationName}
                 placeholder="e.g., Aspirin, Ibuprofen"
-                placeholderTextColor="rgb(255, 255, 255)"
+                placeholderTextColor={theme.colors.fieldDefaultPlaceholder}
                 autoCapitalize="words"
                 autoCorrect={false}
               />
@@ -213,7 +214,7 @@ export default function EditMedication() {
                 value={dosage}
                 onChangeText={setDosage}
                 placeholder="e.g., 500mg, 10ml, 1 tablet"
-                placeholderTextColor="rgb(255, 255, 255)"
+                placeholderTextColor={theme.colors.fieldDefaultPlaceholder}
                 autoCapitalize="none"
                 autoCorrect={false}
               />
@@ -262,26 +263,9 @@ export default function EditMedication() {
                       ]}
                       onPress={() => toggleFamilyMember(member.id)}
                     >
-                      <View style={styles.memberInfo}>
-                        <Text
-                          style={[
-                            styles.memberName,
-                            assignedTo && assignedTo.includes(member.id) && styles.selectedMemberName,
-                          ]}
-                        >
-                          {member.name}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.memberRelation,
-                            assignedTo && assignedTo.includes(member.id) && styles.selectedMemberRelation,
-                          ]}
-                        >
-                          {member.relationship}
-                        </Text>
-                      </View>
+                      <View style={{ flex: 1 }}><Text style={styles.memberName}>{member.name}</Text></View>
                       {assignedTo && assignedTo.includes(member.id) && (
-                        <Ionicons name="checkmark-circle" size={24} color="#4A90E2" />
+                        <Ionicons name="checkmark-circle" size={24} color="#FFFFFF" />
                       )}
                     </TouchableOpacity>
                   ))}
@@ -292,19 +276,19 @@ export default function EditMedication() {
         </ScrollView>
 
         {/* Bottom Save Button */}
-        <View style={styles.bottomContainer}>
+        <View style={styles.bottomActions}>
           <TouchableOpacity
-            style={[styles.saveButton, saving && styles.saveButtonDisabled]}
+            style={[styles.primaryButton, saving && styles.disabledButton]}
             onPress={handleSave}
             disabled={saving}
           >
-            <Text style={styles.saveButtonText}>
+            <Text style={styles.primaryButtonText}>
               {saving ? 'Saving...' : 'Save Changes'}
             </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-    </LinearGradient>
+    </GradientBackground>
   );
 }
 
@@ -312,27 +296,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  safeArea: {
-    flex: 1,
-  },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingTop: 50,
   },
-  backButton: {
+  headerButton: {
     padding: 8,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: '#FFFFFF',
-  },
-  placeholder: {
-    width: 40,
   },
   content: {
     flex: 1,
@@ -355,14 +333,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   textInput: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    padding: 16,
     fontSize: 16,
     color: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   formGrid: {
     flexDirection: 'row',
@@ -372,25 +347,24 @@ const styles = StyleSheet.create({
   formOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: theme.colors.fieldDefault,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 25,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    minWidth: 120,
+    borderColor: theme.colors.fieldDefaultBorder,
   },
   selectedFormOption: {
-    backgroundColor: '#4A90E2',
-    borderColor: '#4A90E2',
+    backgroundColor: theme.colors.fieldSelected,
+    borderColor: theme.colors.fieldSelectedBorder,
   },
   formOptionText: {
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: theme.colors.fieldDefaultText,
     marginLeft: 8,
     fontSize: 14,
   },
   selectedFormOptionText: {
-    color: '#FFFFFF',
+    color: theme.colors.fieldSelectedText,
     fontWeight: '600',
   },
   stockGrid: {
@@ -399,16 +373,16 @@ const styles = StyleSheet.create({
   },
   stockOption: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: theme.colors.fieldDefault,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: theme.colors.fieldDefaultBorder,
   },
   selectedStockOption: {
-    backgroundColor: '#4A90E2',
-    borderColor: '#4A90E2',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: '#FFFFFF',
   },
   stockOptionText: {
     color: 'rgba(255, 255, 255, 0.8)',
@@ -431,7 +405,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   addMemberButton: {
-    backgroundColor: '#4A90E2',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
@@ -454,45 +428,33 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   selectedMemberOption: {
-    backgroundColor: 'rgba(74, 144, 226, 0.2)',
-    borderColor: '#4A90E2',
-  },
-  memberInfo: {
-    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: '#FFFFFF',
   },
   memberName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
-    marginBottom: 2,
   },
-  selectedMemberName: {
-    color: '#FFFFFF',
+  bottomActions: {
+    paddingHorizontal: 20,
+    paddingBottom: 34,
+    paddingTop: 20,
   },
-  memberRelation: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
-  },
-  selectedMemberRelation: {
-    color: 'rgba(255, 255, 255, 0.9)',
-  },
-  bottomContainer: {
-    padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  saveButton: {
-    backgroundColor: '#4A90E2',
-    borderRadius: 12,
-    paddingVertical: 16,
+  primaryButton: {
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 16,
+    borderRadius: 12,
   },
-  saveButtonDisabled: {
-    backgroundColor: 'rgba(74, 144, 226, 0.5)',
+  disabledButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
-  saveButtonText: {
-    color: '#FFFFFF',
+  primaryButtonText: {
     fontSize: 18,
     fontWeight: '600',
+    color: theme.colors.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -500,7 +462,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 16,
+    color: '#FFFFFF',
+    fontSize: 18,
   },
 });

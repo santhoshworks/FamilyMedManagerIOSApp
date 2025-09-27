@@ -1,363 +1,201 @@
+import GradientBackground from '@/components/ui/GradientBackground';
+import { theme } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   Alert,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter, useLocalSearchParams } from 'expo-router';
 import { MedicationWithMembers } from '../types/medication';
 
 export default function MedicationDetailsScreen() {
   const router = useRouter();
   const { medicationData } = useLocalSearchParams();
-  
   const medication: MedicationWithMembers = JSON.parse(medicationData as string);
 
   const handleRefill = () => {
-    Alert.prompt(
-      'Refill Medication',
-      `How many days worth of ${medication.name} would you like to add?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Add', 
-          onPress: (days?: string) => {
-            const additionalDays = parseInt(days || '0');
-            if (additionalDays > 0) {
-              Alert.alert('Success', `Added ${additionalDays} days to ${medication.name}. Please return to the main screen to see updates.`);
-            }
-          }
-        }
-      ],
-      'plain-text',
-      '30'
-    );
-  };
-
-  const handleAskQuestion = () => {
-    Alert.alert('Ask a Question', 'This feature will connect you with a healthcare professional or AI assistant for medication-related questions.');
+    Alert.alert('Refill', 'This feature is coming soon!');
   };
 
   const getStockColor = (stockLevel: string) => {
     switch (stockLevel) {
-      case 'good': return '#4CAF50';
-      case 'low': return '#FF9800';
-      case 'critical': return '#F44336';
-      default: return '#9E9E9E';
+      case 'good': return theme.colors.stockGood;
+      case 'low': return theme.colors.stockLow;
+      case 'critical': return theme.colors.stockCritical;
+      default: return 'rgba(255, 255, 255, 0.7)';
     }
   };
 
-  const getStockWidth = (daysLeft: number) => {
-    if (daysLeft > 20) return '100%';
-    if (daysLeft > 10) return '60%';
-    if (daysLeft > 5) return '30%';
-    return '15%';
-  };
-
-  const assignedNames = medication.members.map(m => m.name).join(', ');
-  const inventoryText = medication.currentCount && medication.totalCount 
-    ? `${medication.currentCount}/${medication.totalCount} ${medication.name.includes('Syrup') ? 'ml' : 'pills'}`
-    : 'Not specified';
+  const DetailCard = ({ icon, title, value }: { icon: any; title: string; value: string }) => (
+    <View style={styles.detailCard}>
+      <Ionicons name={icon} size={24} color="#FFFFFF" />
+      <View style={styles.detailTextContainer}>
+        <Text style={styles.detailTitle}>{title}</Text>
+        <Text style={styles.detailValue}>{value}</Text>
+      </View>
+    </View>
+  );
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Medication Details</Text>
-        <View style={styles.placeholder} />
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Medication Name & Status */}
-        <View style={styles.medicationHeader}>
-          <Text style={styles.medicationName}>{medication.name}</Text>
-          {medication.stockLevel === 'critical' && (
-            <View style={styles.criticalBadge}>
-              <Ionicons name="warning" size={16} color="white" />
-              <Text style={styles.criticalText}>LOW STOCK!</Text>
-            </View>
-          )}
+    <GradientBackground>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.headerButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle} numberOfLines={1}>{medication.name}</Text>
+          <TouchableOpacity style={styles.headerButton} onPress={() => router.push(`/edit-medication/${medication.id}`)}>
+            <Ionicons name="pencil" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
 
-        {/* Priority Information Cards */}
-        <View style={styles.prioritySection}>
-          {/* Stock Level - Highest Priority */}
-          <View style={[styles.infoCard, styles.priorityCard]}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="analytics" size={20} color={getStockColor(medication.stockLevel)} />
-              <Text style={styles.cardTitle}>Stock Status</Text>
-            </View>
-            <View style={styles.stockContainer}>
-              <View style={styles.stockBar}>
-                <View
-                  style={[
-                    styles.stockFill,
-                    {
-                      backgroundColor: getStockColor(medication.stockLevel),
-                      width: getStockWidth(medication.daysLeft),
-                    },
-                  ]}
-                />
-              </View>
-              <Text style={styles.stockText}>
-                {medication.daysLeft} days remaining • {medication.stockLevel.toUpperCase()}
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>{medication.name}</Text>
+            <Text style={styles.dosage}>{medication.dosage}</Text>
+          </View>
+
+          <View style={styles.stockStatusCard}>
+            <Text style={styles.stockStatusTitle}>Inventory Status</Text>
+            <View style={styles.stockStatusContent}>
+              <Text style={[styles.stockStatusDays, { color: getStockColor(medication.stockLevel) }]}>
+                {medication.daysLeft} days left
+              </Text>
+              <Text style={styles.stockStatusCount}>
+                ({medication.currentCount}/{medication.totalCount} pills)
               </Text>
             </View>
           </View>
 
-          {/* Current Inventory */}
-          <View style={styles.infoCard}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="cube" size={20} color="#4A90E2" />
-              <Text style={styles.cardTitle}>Current Inventory</Text>
-            </View>
-            <Text style={styles.cardValue}>{inventoryText}</Text>
-          </View>
+          <DetailCard icon="medkit-outline" title="Form" value={medication.form} />
+          <DetailCard icon="people-outline" title="Assigned To" value={medication.members.map(m => m.name).join(', ')} />
+          <DetailCard icon="time-outline" title="Last Taken" value={medication.lastTaken ? new Date(medication.lastTaken).toLocaleDateString() : 'Never'} />
 
-          {/* Dosage Information */}
-          <View style={styles.infoCard}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="medical" size={20} color="#4A90E2" />
-              <Text style={styles.cardTitle}>Dosage</Text>
-            </View>
-            <Text style={styles.cardValue}>{medication.dosage || 'Not specified'}</Text>
-          </View>
+        </ScrollView>
 
-          {/* Assigned Family Members */}
-          <View style={styles.infoCard}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="people" size={20} color="#4A90E2" />
-              <Text style={styles.cardTitle}>Assigned To</Text>
-            </View>
-            <View style={styles.membersContainer}>
-              {medication.members.map(member => (
-                <View
-                  key={member.id}
-                  style={[
-                    styles.memberTag,
-                    { backgroundColor: member.color },
-                  ]}
-                >
-                  <Ionicons 
-                    name={member.type === 'adult' ? 'person' : 'lock-closed'} 
-                    size={12} 
-                    color="white" 
-                  />
-                  <Text style={styles.memberName}>{member.name}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
-          {/* Last Taken */}
-          <View style={styles.infoCard}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="time" size={20} color="#4A90E2" />
-              <Text style={styles.cardTitle}>Last Taken</Text>
-            </View>
-            <Text style={styles.cardValue}>
-              {medication.lastTaken 
-                ? new Date(medication.lastTaken).toLocaleDateString() 
-                : 'Never recorded'
-              }
-            </Text>
-          </View>
+        <View style={styles.bottomActions}>
+          <TouchableOpacity style={styles.primaryButton} onPress={handleRefill}>
+            <Ionicons name="add-circle-outline" size={20} color={theme.colors.primary} />
+            <Text style={styles.primaryButtonText}>Request Refill</Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
-
-      {/* Action Buttons */}
-      <View style={styles.actionButtons}>
-        <TouchableOpacity 
-          style={[styles.actionButton, styles.askButton]}
-          onPress={handleAskQuestion}
-        >
-          <Ionicons name="chatbubble-outline" size={20} color="#4A90E2" />
-          <Text style={styles.askButtonText}>Ask Question</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.actionButton, styles.refillButton]}
-          onPress={handleRefill}
-        >
-          <Ionicons name="add-circle" size={20} color="white" />
-          <Text style={styles.refillButtonText}>Refill</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
     paddingTop: 50,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
   },
-  backButton: {
+  headerButton: {
     padding: 8,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
-    color: '#333',
-  },
-  placeholder: {
-    width: 40,
+    color: '#FFFFFF',
+    flex: 1,
+    textAlign: 'center',
+    marginHorizontal: 10,
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
   },
-  medicationHeader: {
+  titleContainer: {
     alignItems: 'center',
-    paddingVertical: 30,
+    marginVertical: 20,
   },
-  medicationName: {
-    fontSize: 28,
+  title: {
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
     textAlign: 'center',
-    marginBottom: 10,
   },
-  criticalBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F44336',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+  dosage: {
+    fontSize: 18,
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginTop: 4,
   },
-  criticalText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginLeft: 4,
-  },
-  prioritySection: {
-    paddingBottom: 100,
-  },
-  infoCard: {
-    backgroundColor: 'white',
+  stockStatusCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  priorityCard: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#4A90E2',
-  },
-  cardHeader: {
-    flexDirection: 'row',
+    padding: 20,
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 20,
   },
-  cardTitle: {
+  stockStatusTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginBottom: 12,
+  },
+  stockStatusContent: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  stockStatusDays: {
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+  stockStatusCount: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.8)',
     marginLeft: 8,
   },
-  cardValue: {
-    fontSize: 16,
-    color: '#666',
-    lineHeight: 24,
-  },
-  stockContainer: {
-    marginTop: 8,
-  },
-  stockBar: {
-    height: 8,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 4,
-    marginBottom: 8,
-  },
-  stockFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  stockText: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-  },
-  membersContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  memberTag: {
+  detailCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginRight: 8,
-    marginBottom: 4,
   },
-  memberName: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '500',
-    marginLeft: 4,
+  detailTextContainer: {
+    marginLeft: 16,
   },
-  actionButtons: {
-    flexDirection: 'row',
+  detailTitle: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+  detailValue: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginTop: 4,
+  },
+  bottomActions: {
     paddingHorizontal: 20,
-    paddingVertical: 20,
-    paddingBottom: 40,
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    paddingBottom: 34,
+    paddingTop: 20,
   },
-  actionButton: {
-    flex: 1,
+  primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginHorizontal: 6,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 16,
+    borderRadius: 12,
+    gap: 8,
   },
-  askButton: {
-    backgroundColor: '#E3F2FD',
-  },
-  askButtonText: {
-    color: '#4A90E2',
-    fontSize: 16,
-    fontWeight: '500',
-    marginLeft: 8,
-  },
-  refillButton: {
-    backgroundColor: '#4A90E2',
-  },
-  refillButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '500',
-    marginLeft: 8,
+  primaryButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.primary,
   },
 });

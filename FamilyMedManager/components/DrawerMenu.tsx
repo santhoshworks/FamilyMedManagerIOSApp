@@ -88,7 +88,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
           <SafeAreaView style={styles.drawerContent}>
             {/* Header */}
             <View style={styles.header}>
-              <Text style={styles.headerTitle}>Menu</Text>
+              <Text style={styles.headerTitle}>Family Med Manager</Text>
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                 <Ionicons name="close" size={24} color="#333" />
               </TouchableOpacity>

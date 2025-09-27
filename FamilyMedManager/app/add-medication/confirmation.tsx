@@ -1,3 +1,4 @@
+import GradientBackground from '@/components/ui/GradientBackground';
 import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -56,9 +57,9 @@ export default function ConfirmationScreen() {
 
   const getStockLevelColor = (level: string) => {
     switch (level) {
-      case 'critical': return '#FF4444';
-      case 'low': return '#FF8800';
-      default: return '#00AA44';
+      case 'critical': return theme.colors.stockCritical;
+      case 'low': return theme.colors.stockLow;
+      default: return theme.colors.stockGood;
     }
   };
 
@@ -71,8 +72,8 @@ export default function ConfirmationScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={[styles.gradient, styles.gradientBackground]}>
+    <GradientBackground>
+      <SafeAreaView style={styles.container}>
         {/* Header with Progress */}
         <View style={styles.header}>
           <TouchableOpacity
@@ -123,19 +124,6 @@ export default function ConfirmationScreen() {
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Form:</Text>
                 <Text style={styles.detailValue}>{params.medicationForm}</Text>
-              </View>
-            </View>
-
-            {/* Schedule */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Schedule</Text>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Frequency:</Text>
-                <Text style={styles.detailValue}>{params.frequency}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Timing:</Text>
-                <Text style={styles.detailValue}>{params.timing}</Text>
               </View>
             </View>
 
@@ -208,25 +196,20 @@ export default function ConfirmationScreen() {
             ) : (
               <>
                 <Text style={styles.saveButtonText}>Save Medication</Text>
-                <Ionicons name="checkmark" size={20} color="#4A90E2" />
+                <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
               </>
             )}
           </TouchableOpacity>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  gradient: {
-    flex: 1,
-  },
-  gradientBackground: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
@@ -269,11 +252,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#FFFFFF',
     borderRadius: 2,
-  },
-  progressText: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
   },
   content: {
     flex: 1,
@@ -362,6 +340,6 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#4A90E2',
+    color: theme.colors.primary,
   },
 });

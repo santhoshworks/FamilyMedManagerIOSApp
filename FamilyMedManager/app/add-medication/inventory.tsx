@@ -1,3 +1,4 @@
+import GradientBackground from '@/components/ui/GradientBackground';
 import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -71,8 +72,8 @@ export default function InventoryScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={[styles.gradient, styles.gradientBackground]}>
+    <GradientBackground>
+      <SafeAreaView style={styles.container}>
         {/* Header with Progress */}
         <View style={styles.header}>
           <TouchableOpacity
@@ -118,21 +119,21 @@ export default function InventoryScreen() {
                   style={styles.countButton}
                   onPress={() => adjustCount('current', false)}
                 >
-                  <Ionicons name="remove" size={20} color="#4A90E2" />
+                  <Ionicons name="remove" size={20} color={theme.colors.primary} />
                 </TouchableOpacity>
                 <TextInput
                   style={styles.countInput}
                   value={currentCount}
                   onChangeText={setCurrentCount}
                   placeholder="0"
-                  placeholderTextColor="rgb(255, 255, 255)"
+                  placeholderTextColor="rgba(255, 255, 255, 0.7)"
                   keyboardType="numeric"
                 />
                 <TouchableOpacity
                   style={styles.countButton}
                   onPress={() => adjustCount('current', true)}
                 >
-                  <Ionicons name="add" size={20} color="#4A90E2" />
+                  <Ionicons name="add" size={20} color={theme.colors.primary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -144,21 +145,21 @@ export default function InventoryScreen() {
                   style={styles.countButton}
                   onPress={() => adjustCount('total', false)}
                 >
-                  <Ionicons name="remove" size={20} color="#4A90E2" />
+                  <Ionicons name="remove" size={20} color={theme.colors.primary} />
                 </TouchableOpacity>
                 <TextInput
                   style={styles.countInput}
                   value={totalCount}
                   onChangeText={setTotalCount}
                   placeholder="0"
-                  placeholderTextColor="rgb(255, 255, 255)"
+                  placeholderTextColor="rgba(255, 255, 255, 0.7)"
                   keyboardType="numeric"
                 />
                 <TouchableOpacity
                   style={styles.countButton}
                   onPress={() => adjustCount('total', true)}
                 >
-                  <Ionicons name="add" size={20} color="#4A90E2" />
+                  <Ionicons name="add" size={20} color={theme.colors.primary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -167,7 +168,7 @@ export default function InventoryScreen() {
 
 
           {/* Refill Reminder Section */}
-          <View style={styles.section}>
+          {/* <View style={styles.section}>
             <TouchableOpacity
               style={styles.reminderToggle}
               onPress={() => setRefillReminder(!refillReminder)}
@@ -188,7 +189,7 @@ export default function InventoryScreen() {
                 ]} />
               </View>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </ScrollView>
 
         {/* Bottom Actions */}
@@ -210,24 +211,19 @@ export default function InventoryScreen() {
             <Ionicons
               name="arrow-forward"
               size={20}
-              color={(!currentCount || !totalCount) ? '#999' : '#4A90E2'}
+              color={(!currentCount || !totalCount) ? '#999' : theme.colors.primary}
             />
           </TouchableOpacity>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  gradient: {
-    flex: 1,
-  },
-  gradientBackground: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
@@ -270,11 +266,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#FFFFFF',
     borderRadius: theme.borderRadius.sm,
-  },
-  progressText: {
-    fontSize: theme.typography.sm,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
   },
   content: {
     flex: 1,
@@ -338,64 +329,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: theme.spacing.md,
     marginHorizontal: theme.spacing.md,
-  },
-  inputContainer: {
-    marginBottom: theme.spacing.lg,
-  },
-  inputLabel: {
-    fontSize: theme.typography.base,
-    color: '#FFFFFF',
-    marginBottom: theme.spacing.sm,
-  },
-  textInput: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: theme.borderRadius.md,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
-    fontSize: theme.typography.base,
-    color: '#FFFFFF',
-  },
-  reminderToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
-  },
-  reminderInfo: {
-    flex: 1,
-  },
-  reminderTitle: {
-    fontSize: theme.typography.base,
-    fontWeight: theme.typography.semibold,
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  reminderSubtitle: {
-    fontSize: theme.typography.sm,
-    color: 'rgba(255, 255, 255, 0.7)',
-  },
-  toggle: {
-    width: 50,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    justifyContent: 'center',
-    paddingHorizontal: 2,
-  },
-  toggleActive: {
-    backgroundColor: '#FFFFFF',
-  },
-  toggleThumb: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: '#FFFFFF',
-  },
-  toggleThumbActive: {
-    backgroundColor: theme.colors.primary,
-    alignSelf: 'flex-end',
   },
   bottomActions: {
     paddingHorizontal: theme.spacing.lg,

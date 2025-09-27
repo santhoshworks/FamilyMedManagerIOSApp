@@ -54,6 +54,19 @@ export const theme = {
     // Shadow colors
     shadow: 'rgba(0, 0, 0, 0.1)',
     shadowLight: 'rgba(0, 0, 0, 0.05)',
+
+    // Form field colors for better readability
+    fieldDefault: 'rgba(38, 81, 134, 0.57)', // Your requested default field color
+    fieldDefaultText: '#FFFFFF',
+    fieldDefaultPlaceholder: 'rgba(255, 255, 255, 0.6)',
+    fieldDefaultBorder: 'rgba(255, 255, 255, 0.4)',
+
+    fieldSelected: 'rgba(91, 127, 229, 0.8)', // Brighter selected state using primary color
+    fieldSelectedText: '#FFFFFF',
+    fieldSelectedBorder: '#FFFFFF',
+
+    fieldFocused: 'rgba(91, 127, 229, 0.6)', // Focused state
+    fieldFocusedBorder: 'rgba(255, 255, 255, 0.8)',
   },
 
   spacing: {

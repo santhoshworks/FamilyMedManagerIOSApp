@@ -1,9 +1,12 @@
+import GradientBackground from '@/components/ui/GradientBackground';
+import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Modal,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -86,8 +89,8 @@ export default function ManageFamilyMembersScreen() {
             } catch (error) {
               Alert.alert('Error', 'Failed to delete family member');
             }
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -95,34 +98,20 @@ export default function ManageFamilyMembersScreen() {
   const renderFamilyMember = (member: FamilyMember) => (
     <View key={member.id} style={styles.memberCard}>
       <View style={styles.memberInfo}>
-        <View style={[styles.memberAvatar, { backgroundColor: member.color }]}>
-          <Ionicons
-            name={member.type === 'adult' ? 'person' : 'lock-closed'}
-            size={24}
-            color="white"
-          />
+        <View style={[styles.avatar, { backgroundColor: member.color }]}>
+          <Text style={styles.avatarText}>{member.name.charAt(0).toUpperCase()}</Text>
         </View>
-        <View style={styles.memberDetails}>
+        <View>
           <Text style={styles.memberName}>{member.name}</Text>
-          <Text style={styles.memberType}>
-            {member.type === 'adult' ? 'Adult' : 'Child'}
-          </Text>
+          <Text style={styles.memberType}>{member.type === 'adult' ? 'Adult' : 'Child'}</Text>
         </View>
       </View>
-
       <View style={styles.memberActions}>
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={() => handleEdit(member)}
-        >
-          <Ionicons name="pencil" size={18} color="#4A90E2" />
+        <TouchableOpacity style={styles.actionButton} onPress={() => handleEdit(member)}>
+          <Ionicons name="pencil" size={20} color="#FFFFFF" />
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => handleDelete(member)}
-        >
-          <Ionicons name="trash" size={18} color="#F44336" />
+        <TouchableOpacity style={styles.actionButton} onPress={() => handleDelete(member)}>
+          <Ionicons name="trash" size={20} color={theme.colors.error} />
         </TouchableOpacity>
       </View>
     </View>
@@ -130,381 +119,273 @@ export default function ManageFamilyMembersScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <GradientBackground>
         <View style={styles.loadingContainer}>
-          <Text>Loading...</Text>
+          <Text style={styles.loadingText}>Loading...</Text>
         </View>
-      </View>
+      </GradientBackground>
     );
   }
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Manage Family Members</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push('/add-family-member')}
-        >
-          <Ionicons name="add" size={24} color="#4A90E2" />
-        </TouchableOpacity>
-      </View>
+    <GradientBackground>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.headerButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Family Members</Text>
+          <View style={{ width: 40 }} />
+        </View>
 
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.membersContainer}>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <Text style={styles.title}>Manage Your Family</Text>
+
           {familyMembers.length > 0 ? (
             familyMembers.map(renderFamilyMember)
           ) : (
             <View style={styles.emptyState}>
-              <Ionicons name="people-outline" size={64} color="#B0B0B0" />
-              <Text style={styles.emptyStateText}>No family members yet</Text>
-              <Text style={styles.emptyStateSubtext}>
-                Add your first family member to get started
-              </Text>
-              <TouchableOpacity
-                style={styles.emptyStateButton}
-                onPress={() => router.push('/add-family-member')}
-              >
-                <Text style={styles.emptyStateButtonText}>Add Family Member</Text>
-              </TouchableOpacity>
+              <Ionicons name="people-outline" size={48} color="rgba(255, 255, 255, 0.5)" />
+              <Text style={styles.emptyStateText}>No family members found.</Text>
             </View>
           )}
+        </ScrollView>
+
+        <View style={styles.bottomActions}>
+          <TouchableOpacity style={styles.primaryButton} onPress={() => router.push('/add-family-member')}>
+            <Ionicons name="add" size={20} color={theme.colors.primary} />
+            <Text style={styles.primaryButtonText}>Add Family Member</Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
 
-      {/* Fixed Bottom Footer with Add Button */}
-      <View style={styles.bottomFooter}>
-        <TouchableOpacity
-          style={styles.addFamilyFooterButton}
-          onPress={() => router.push('/add-family-member')}
+        <Modal
+          visible={editModalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setEditModalVisible(false)}
         >
-          <Ionicons name="person-add" size={20} color="white" />
-          <Text style={styles.footerButtonText}>Add Family Member</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Edit Modal */}
-      <Modal
-        visible={editModalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setEditModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setEditModalVisible(false)}>
-              <Text style={styles.modalCancelText}>Cancel</Text>
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Edit Family Member</Text>
-            <TouchableOpacity onPress={handleSaveEdit}>
-              <Text style={styles.modalSaveText}>Save</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.modalContent}>
-            <View style={styles.inputSection}>
-              <Text style={styles.label}>Name</Text>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Edit Family Member</Text>
               <TextInput
                 style={styles.textInput}
                 value={editName}
                 onChangeText={setEditName}
                 placeholder="Enter name"
-                autoCapitalize="words"
+                placeholderTextColor="rgba(255, 255, 255, 0.7)"
               />
-            </View>
-
-            <View style={styles.inputSection}>
-              <Text style={styles.label}>Type</Text>
-              <View style={styles.typeContainer}>
+              <View style={styles.typeSelector}>
                 <TouchableOpacity
-                  style={[
-                    styles.typeButton,
-                    editType === 'adult' && styles.typeButtonSelected,
-                  ]}
+                  style={[styles.typeButton, editType === 'adult' && styles.typeButtonSelected]}
                   onPress={() => setEditType('adult')}
                 >
-                  <Ionicons
-                    name="person"
-                    size={20}
-                    color={editType === 'adult' ? 'white' : '#4A90E2'}
-                  />
-                  <Text style={[
-                    styles.typeButtonText,
-                    editType === 'adult' && styles.typeButtonTextSelected,
-                  ]}>
-                    Adult
-                  </Text>
+                  <Text style={styles.typeButtonText}>Adult</Text>
                 </TouchableOpacity>
-
                 <TouchableOpacity
-                  style={[
-                    styles.typeButton,
-                    editType === 'child' && styles.typeButtonSelected,
-                  ]}
+                  style={[styles.typeButton, editType === 'child' && styles.typeButtonSelected]}
                   onPress={() => setEditType('child')}
                 >
-                  <Ionicons
-                    name="lock-closed"
-                    size={20}
-                    color={editType === 'child' ? 'white' : '#F5A623'}
-                  />
-                  <Text style={[
-                    styles.typeButtonText,
-                    editType === 'child' && styles.typeButtonTextSelected,
-                  ]}>
-                    Child
-                  </Text>
+                  <Text style={styles.typeButtonText}>Child</Text>
                 </TouchableOpacity>
               </View>
+              <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
+                <Text style={styles.saveButtonText}>Save Changes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cancelButton} onPress={() => setEditModalVisible(false)}>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+  },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
     paddingTop: 50,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
   },
-  backButton: {
+  headerButton: {
     padding: 8,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
-    color: '#333',
-  },
-  addButton: {
-    padding: 8,
+    color: '#FFFFFF',
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
   },
-  scrollContent: {
-    paddingBottom: 100, // Space for the fixed footer
-  },
-  membersContainer: {
-    paddingTop: 20,
-    paddingBottom: 40,
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginVertical: 20,
   },
   memberCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   memberInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  memberAvatar: {
+  avatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    justifyContent: 'center',
+    marginRight: 16,
   },
-  memberDetails: {
-    flex: 1,
+  avatarText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
   memberName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 2,
+    color: '#FFFFFF',
   },
   memberType: {
     fontSize: 14,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginTop: 4,
   },
   memberActions: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  editButton: {
+  actionButton: {
     padding: 8,
-    marginRight: 8,
-  },
-  deleteButton: {
-    padding: 8,
+    marginLeft: 8,
   },
   emptyState: {
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
+    paddingVertical: 40,
   },
   emptyStateText: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  bottomActions: {
+    paddingHorizontal: 20,
+    paddingBottom: 34,
+    paddingTop: 20,
+  },
+  primaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 16,
+    borderRadius: 12,
+    gap: 8,
+  },
+  primaryButtonText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#666',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyStateSubtext: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  emptyStateButton: {
-    backgroundColor: '#4A90E2',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  emptyStateButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '500',
+    color: theme.colors.primary,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  modalHeader: {
-    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    paddingTop: 50,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-  },
-  modalCancelText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  modalSaveText: {
-    fontSize: 16,
-    color: '#4A90E2',
-    fontWeight: '500',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 30,
+    width: '85%',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
   },
-  inputSection: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 20,
   },
   textInput: {
-    backgroundColor: 'white',
+    width: '100%',
+    backgroundColor: theme.colors.fieldDefault,
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    padding: 16,
     fontSize: 16,
-    color: '#333',
+    color: theme.colors.fieldDefaultText,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: theme.colors.fieldDefaultBorder,
   },
-  typeContainer: {
+  typeSelector: {
     flexDirection: 'row',
-    gap: 12,
+    marginBottom: 20,
   },
   typeButton: {
     flex: 1,
-    flexDirection: 'row',
+    padding: 12,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
+    backgroundColor: theme.colors.fieldDefault,
+    borderWidth: 1,
+    borderColor: theme.colors.fieldDefaultBorder,
   },
   typeButtonSelected: {
-    backgroundColor: '#4A90E2',
-    borderColor: '#4A90E2',
+    backgroundColor: theme.colors.fieldSelected,
+    borderColor: theme.colors.fieldSelectedBorder,
   },
   typeButtonText: {
+    color: theme.colors.fieldDefaultText,
     fontSize: 16,
-    fontWeight: '500',
-    color: '#4A90E2',
-    marginLeft: 8,
   },
-  typeButtonTextSelected: {
-    color: 'white',
-  },
-  bottomFooter: {
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    paddingBottom: 34, // Extra padding for safe area
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 8,
-  },
-  addFamilyFooterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FF9800',
-    paddingVertical: 14,
+  saveButton: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    padding: 16,
     borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  footerButtonText: {
-    color: 'white',
-    fontSize: 14,
+  saveButtonText: {
+    color: theme.colors.primary,
+    fontSize: 18,
     fontWeight: '600',
-    marginLeft: 8,
+  },
+  cancelButton: {
+    width: '100%',
+    padding: 12,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 16,
   },
 });
