@@ -1,3 +1,4 @@
+import RefillModal from '@/components/RefillModal';
 import GradientBackground from '@/components/ui/GradientBackground';
 import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -42,6 +43,10 @@ export default function EditMedication() {
   const [assignedTo, setAssignedTo] = useState<string[]>([]);
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
 
+  // Refill modal state
+  const [showRefillModal, setShowRefillModal] = useState(false);
+  const [refilling, setRefilling] = useState(false);
+
   useEffect(() => {
     loadMedicationData();
   }, [id]);
@@ -78,6 +83,51 @@ export default function EditMedication() {
     }
   };
 
+  // Helper function to compute stock level from counts
+  const computeStockLevelFromCounts = (current?: number, total?: number) => {
+    if (typeof current !== 'number' || typeof total !== 'number' || total <= 0) {
+      return 'good';
+    }
+    const ratio = current / total;
+    if (current <= 3 || ratio <= 0.05) return 'critical';
+    if (current <= 10 || ratio <= 0.25) return 'low';
+    return 'good';
+  };
+
+  const handleRefill = async (newCount: number) => {
+    if (!originalMedication) return;
+
+    setRefilling(true);
+    try {
+      // Update medication with new count
+      const updatedMedication: Medication = {
+        ...originalMedication,
+        currentCount: newCount,
+        totalCount: Math.max(originalMedication.totalCount || 0, newCount), // Ensure totalCount is at least newCount
+        daysLeft: newCount, // Assuming 1 dose per day
+        stockLevel: computeStockLevelFromCounts(newCount, Math.max(originalMedication.totalCount || 0, newCount)),
+      };
+
+      await DataService.updateMedication(updatedMedication);
+
+      // Reload medication data to refresh the UI
+      await loadMedicationData();
+
+      setShowRefillModal(false);
+
+      Alert.alert(
+        'Refill Successful!',
+        `${medicationName} has been refilled to ${newCount} doses.`,
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      console.error('Error refilling medication:', error);
+      Alert.alert('Error', 'Failed to refill medication. Please try again.');
+    } finally {
+      setRefilling(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!originalMedication) {
       Alert.alert('Error', 'Original medication data not found.');
@@ -109,11 +159,14 @@ export default function EditMedication() {
           {
             text: 'OK',
             onPress: () => {
-              // Navigate back to dashboard to ensure data refresh
+              // Prefer going back to the previous screen so we don't force
+              // navigation into the standalone /dashboard route which can
+              // sometimes show an empty filtered view. Fall back to replace
+              // only if router.back() throws for some reason.
               try {
-                router.replace('/dashboard');
-              } catch {
                 router.back();
+              } catch {
+                router.replace('/dashboard');
               }
             }
           }
@@ -168,12 +221,22 @@ export default function EditMedication() {
       ]}
       onPress={() => setStockLevel(level)}
     >
-      <Text style={[
-        styles.stockOptionText,
-        stockLevel === level && styles.selectedStockOptionText
-      ]}>
-        {level.charAt(0).toUpperCase() + level.slice(1)}
-      </Text>
+      <View style={{ alignItems: 'center' }}>
+        <Text style={[
+          styles.stockOptionText,
+          stockLevel === level && styles.selectedStockOptionText
+        ]}>
+          {level.charAt(0).toUpperCase() + level.slice(1)}
+        </Text>
+        {/* Show available counts if present on the original medication */}
+        <Text style={styles.stockOptionCount}>
+          {originalMedication && (typeof originalMedication.currentCount === 'number'
+            ? `${originalMedication.currentCount}/${originalMedication.totalCount ?? '-'} pills`
+            : (typeof originalMedication?.totalCount === 'number'
+              ? `${originalMedication.totalCount} pills total`
+              : 'No count'))}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 
@@ -284,6 +347,30 @@ export default function EditMedication() {
                 </View>
               )}
             </View>
+
+            {/* Refill Section */}
+            {originalMedication && (
+              <View style={styles.inputSection}>
+                <Text style={styles.label}>Inventory Management</Text>
+                <View style={styles.refillSection}>
+                  <View style={styles.inventoryInfo}>
+                    <Text style={styles.inventoryText}>
+                      Current: {originalMedication.currentCount || 0} doses
+                    </Text>
+                    <Text style={styles.inventoryText}>
+                      Total: {originalMedication.totalCount || 0} doses
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.refillButton}
+                    onPress={() => setShowRefillModal(true)}
+                  >
+                    <Ionicons name="add-circle-outline" size={20} color="#FFFFFF" />
+                    <Text style={styles.refillButtonText}>Refill</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </View>
         </ScrollView>
 
@@ -299,6 +386,16 @@ export default function EditMedication() {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* Refill Modal */}
+        <RefillModal
+          visible={showRefillModal}
+          onClose={() => setShowRefillModal(false)}
+          onConfirm={handleRefill}
+          medicationName={medicationName}
+          currentCount={originalMedication?.currentCount || 0}
+          loading={refilling}
+        />
       </SafeAreaView>
     </GradientBackground>
   );
@@ -404,6 +501,11 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '600',
   },
+  stockOptionCount: {
+    marginTop: 6,
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)'
+  },
   noMembersContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
@@ -476,5 +578,35 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#FFFFFF',
     fontSize: 18,
+  },
+  refillSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    padding: 16,
+  },
+  inventoryInfo: {
+    flex: 1,
+  },
+  inventoryText: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginBottom: 4,
+  },
+  refillButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 6,
+  },
+  refillButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 });

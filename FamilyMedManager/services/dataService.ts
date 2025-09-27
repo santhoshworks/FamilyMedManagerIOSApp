@@ -19,6 +19,7 @@ const sampleMedications: Medication[] = [
     id: '1',
     name: 'Lisinopril',
     dosage: '10mg',
+    form: 'tablet',
     assignedMembers: ['1', '2'],
     daysLeft: 25,
     stockLevel: 'good',
@@ -29,6 +30,7 @@ const sampleMedications: Medication[] = [
     id: '2',
     name: 'Vitamin D',
     dosage: '2000IU',
+    form: 'capsule',
     assignedMembers: ['1', '2'],
     daysLeft: 10,
     stockLevel: 'low',
@@ -39,6 +41,7 @@ const sampleMedications: Medication[] = [
     id: '3',
     name: 'Allergy Syrup',
     dosage: '',
+    form: 'liquid',
     assignedMembers: ['3'],
     daysLeft: 3,
     stockLevel: 'critical',
@@ -49,6 +52,7 @@ const sampleMedications: Medication[] = [
     id: '4',
     name: 'Ibuprofen',
     dosage: '100mg',
+    form: 'tablet',
     assignedMembers: ['4'],
     daysLeft: 8,
     stockLevel: 'good',
@@ -289,9 +293,15 @@ export class DataService {
           const newCurrentCount = typeof med.currentCount === 'number' ? Math.max(0, med.currentCount - 1) : undefined;
           const newDaysLeft = typeof med.daysLeft === 'number' ? Math.max(0, med.daysLeft - 1) : med.daysLeft;
 
-          // Recompute stock level based on daysLeft thresholds (critical: <=3, low: <=10, good: >10)
+          // Recompute stock level based on counts (preferred):
+          // If counts exist, use thresholds on currentCount/totalCount; otherwise fall back to daysLeft logic
           let newStockLevel = med.stockLevel || 'good';
-          if (typeof newDaysLeft === 'number') {
+          if (typeof newCurrentCount === 'number' && typeof med.totalCount === 'number' && med.totalCount > 0) {
+            const ratio = newCurrentCount / med.totalCount;
+            if (newCurrentCount <= 3 || ratio <= 0.05) newStockLevel = 'critical';
+            else if (newCurrentCount <= 10 || ratio <= 0.25) newStockLevel = 'low';
+            else newStockLevel = 'good';
+          } else if (typeof newDaysLeft === 'number') {
             if (newDaysLeft <= 3) newStockLevel = 'critical';
             else if (newDaysLeft <= 10) newStockLevel = 'low';
             else newStockLevel = 'good';

@@ -23,6 +23,25 @@ export default function ConfirmationScreen() {
     setSaving(true);
     try {
       // Create medication object
+      // Helper: compute stock level from counts
+      const computeStockLevelFromCounts = (current?: number, total?: number) => {
+        // If counts aren't available, fall back to 'good'
+        if (typeof current !== 'number' || typeof total !== 'number' || total <= 0) {
+          return 'good';
+        }
+        const ratio = current / total;
+        // Reasonable thresholds:
+        // - critical: <= 5% or current <= 3
+        // - low: <= 25% or current <= 10
+        // - good: otherwise
+        if (current <= 3 || ratio <= 0.05) return 'critical';
+        if (current <= 10 || ratio <= 0.25) return 'low';
+        return 'good';
+      };
+
+      const currentCountParsed = parseInt(params.currentCount as string);
+      const totalCountParsed = parseInt(params.totalCount as string);
+
       const medication = {
         id: Date.now().toString(), // Simple ID generation
         name: params.medicationName as string,
@@ -33,10 +52,10 @@ export default function ConfirmationScreen() {
         assignedMembers: Array.isArray(params.assignedMembers)
           ? params.assignedMembers
           : [params.assignedMembers].filter(Boolean),
-        currentCount: parseInt(params.currentCount as string),
-        totalCount: parseInt(params.totalCount as string),
+        currentCount: currentCountParsed,
+        totalCount: totalCountParsed,
         daysLeft: parseInt(params.daysLeft as string),
-        stockLevel: params.stockLevel as string,
+        stockLevel: computeStockLevelFromCounts(currentCountParsed, totalCountParsed),
 
         refillReminder: params.refillReminder as string,
         createdAt: new Date().toISOString(),
@@ -70,6 +89,17 @@ export default function ConfirmationScreen() {
       default: return 'Good';
     }
   };
+
+  // Compute stock level for preview from params (so preview matches saved value)
+  const previewCurrent = parseInt(params.currentCount as string);
+  const previewTotal = parseInt(params.totalCount as string);
+  const previewStockLevel = (() => {
+    if (!Number.isFinite(previewCurrent) || !Number.isFinite(previewTotal) || previewTotal <= 0) return 'good';
+    const r = previewCurrent / previewTotal;
+    if (previewCurrent <= 3 || r <= 0.05) return 'critical';
+    if (previewCurrent <= 10 || r <= 0.25) return 'low';
+    return 'good';
+  })();
 
   return (
     <GradientBackground>
@@ -159,13 +189,13 @@ export default function ConfirmationScreen() {
                 <View style={styles.stockLevelContainer}>
                   <View style={[
                     styles.stockLevelDot,
-                    { backgroundColor: getStockLevelColor(params.stockLevel as string) }
+                    { backgroundColor: getStockLevelColor(previewStockLevel) }
                   ]} />
                   <Text style={[
                     styles.detailValue,
-                    { color: getStockLevelColor(params.stockLevel as string) }
+                    { color: getStockLevelColor(previewStockLevel) }
                   ]}>
-                    {getStockLevelText(params.stockLevel as string)}
+                    {getStockLevelText(previewStockLevel)}
                   </Text>
                 </View>
               </View>
