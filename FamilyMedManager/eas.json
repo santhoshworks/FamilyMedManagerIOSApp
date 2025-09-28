@@ -1,0 +1,46 @@
+{
+  "cli": {
+    "version": ">= 16.19.3",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "aab"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "jan.kamaraj@icloud.com",
+        "ascAppId": "placeholder_app_id",
+        "appleTeamId": "placeholder_team_id"
+      },
+      "android": {
+        "serviceAccountKeyPath": "path/to/api-key.json",
+        "track": "internal"
+      }
+    }
+  }
+}

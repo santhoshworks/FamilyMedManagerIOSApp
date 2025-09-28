@@ -2,16 +2,30 @@
   "expo": {
     "name": "FamilyMedManager",
     "slug": "FamilyMedManager",
+    "description": "A comprehensive family medication management app that helps you track medications, manage dosages, monitor inventory, and ensure your family's health needs are met efficiently.",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "familymedmanager",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "primaryColor": "#5B7FE5",
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.magizhdevelopment.familymedmanager",
+      "supportsTablet": true,
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSHealthShareUsageDescription": "This app helps you manage your family's medications and health information.",
+        "NSHealthUpdateUsageDescription": "This app helps you track and update your family's medication schedules."
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.magizhdevelopment.familymedmanager",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -19,11 +33,16 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ]
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
@@ -40,6 +59,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5e87a0c6-295f-427c-bc2d-f21a68b66f30"
+      }
     }
   }
 }

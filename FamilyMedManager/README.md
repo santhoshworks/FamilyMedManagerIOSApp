@@ -1,50 +1,116 @@
-# Welcome to your Expo app 👋
+# FamilyMedManager 💊
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A comprehensive family medication management app built with React Native and Expo. Track medications, manage dosages, monitor inventory, and ensure your family's health needs are met efficiently.
 
-## Get started
+## Features
 
-1. Install dependencies
+- 👨‍👩‍👧‍👦 **Family Management**: Add and manage family members (adults and children)
+- 💊 **Medication Tracking**: Comprehensive medication database with detailed information
+- 📅 **Dosage Scheduling**: Set up and track medication schedules
+- 📦 **Inventory Management**: Monitor medication stock levels and expiration dates
+- 🔍 **AI-Powered Search**: Get medication recommendations and first aid guidance
+- 📱 **Cross-Platform**: Works on iOS, Android, and Web
+- 💾 **Local Storage**: Secure SQLite database for offline functionality
 
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or later)
+- npm or yarn
+- Expo CLI
+- iOS Simulator (for iOS development)
+- Android Studio (for Android development)
+
+### Installation
+
+1. Clone the repository
+   ```bash
+   git clone <repository-url>
+   cd FamilyMedManager
+   ```
+
+2. Install dependencies
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. Set up environment variables
    ```bash
-   npx expo start
+   cp .env.example .env
+   # Add your OpenAI API key for AI search functionality
    ```
 
-In the output, you'll find options to open the app in a
+4. Start the development server
+   ```bash
+   npm start
+   ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Development
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **iOS**: `npm run ios`
+- **Android**: `npm run android`
+- **Web**: `npm run web`
 
-## Get a fresh project
+## Building for Production
 
-When you're ready, run:
-
+### Development Build
 ```bash
-npm run reset-project
+npm run build:development
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Preview Build
+```bash
+npm run build:preview
+```
 
-## Learn more
+### Production Build
+```bash
+npm run build:production
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## App Store Deployment
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### iOS App Store
+1. Update the Apple ID and team information in `eas.json`
+2. Build for production: `npm run build:production`
+3. Submit to App Store: `npm run submit:ios`
 
-## Join the community
+### Google Play Store
+1. Set up service account key in `eas.json`
+2. Build for production: `npm run build:production`
+3. Submit to Play Store: `npm run submit:android`
 
-Join our community of developers creating universal apps.
+## Configuration
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### App Configuration
+- **App Name**: FamilyMedManager
+- **Bundle ID**: com.magizhdevelopment.familymedmanager
+- **Version**: 1.0.0
+
+### Environment Variables
+- `EXPO_PUBLIC_OPENAI_API_KEY`: OpenAI API key for AI search functionality
+
+## Architecture
+
+- **Frontend**: React Native with Expo
+- **Navigation**: Expo Router (file-based routing)
+- **Database**: SQLite with platform-aware fallback to localStorage
+- **State Management**: React hooks and context
+- **Styling**: Custom theme system with consistent design tokens
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests: `npm test`
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
+
+## Support
+
+For support and questions, please contact the development team.
